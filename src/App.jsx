@@ -6,49 +6,45 @@ import "./styles/index.css";
 
 
 function App() {
-  const [items, setItems] = useState(initialItems)
-  const [cartItems, setCartItems] = useState([])
-  // cartItems: [
-  //   {
-  //     id: "005-avocado",
-  //     quantity: 10
-  //   },
-  //   {
-  //     id: "001-beetroot",
-  //     quantity: 1
-  //   }
-  // ]
+  const [itemsInShop, setItemsInShop] = useState(initialItems)
+  const [cart, setCart] = useState([])
+   
+  function addQuantityIntoCart(itemToAdd) {
+    // console.log(`Add Item clicked!`)
+    const newItem = { 
+      id: itemToAdd.id, 
+      name:itemToAdd.name, 
+      quantity: 1
+    }
 
-  const addQuantityIntoCart = itemToAdd => {
-    const updatedCartItems = cartItems =>
-      cartItems.map(cartItem => {
-        const newItemToAdd = {
-          id: itemToAdd.id,
-          quantity: 1
-        }
+    const updateCart = () => {
+      let newCart = []
+      
+      //IF CART IS EMPTY:
+      if (cart.length === 0) {
+        newCart = [...cart, newItem]
+       
+        //IF CART IS NOT EMPTY:
+      } else {
+        //CHECK EACH ITEM IN THE CART
+        cart.map(item => {
+          //IF THE ID MATCHED ONE ALREADY IN THE CART,
+          if (item.id === newItem.id) {
+            let itemClicked = cart.find(itemToFind => itemToFind.id === itemToAdd.id)
+            let itemUpdated = {...itemClicked, quantity: itemClicked.quantity+1}
+            let cartWithoutOldItem = cart.filter(ItemToFilter => ItemToFilter.id !== itemUpdated.id)
+            
+            newCart = [...cartWithoutOldItem, itemUpdated]
+            setCart(newCart)
 
-        itemToAdd.id === cartItem.id  
-        ? {...cartItem, quantity: cartItem.quantity++}
-        : {...cartItem, newItemToAdd}
+
+          } else newCart = [...cart, newItem ]
+        })
       }
-        
-      )
-    setCartItems(updatedCartItems)
-    // for (const cartItem of cartItems) {
-
+      return newCart
+    }
+      setCart(updateCart)
   } 
-  
-
-
- //function minusQuantityIntoCart
-
- //function removeItemFromCard
-
- //function displayItemCart
-
- //function updateTotal
-
-
 
 
 
@@ -57,7 +53,7 @@ function App() {
       <header id="store">
         <h1>Greengrocers</h1>
         <ul className="item-list store--item-list">
-        {items.map(item => (
+        {itemsInShop.map(item => (
             // <Item key={item.id} item={item} />
           <li key={item.id}>
             <div className="store--item-icon">
@@ -79,18 +75,22 @@ function App() {
         <h2>Your Cart</h2>
         <div className="cart--item-list-container">
           <ul className="item-list cart--item-list">
-          {items.map(item => (
-            // <Item key={item.id} item={item} />
-            <li key={item.id}>
+          {cart.map(cartItem => (
+            // <Item key={cartItem.id} cartItem={cartItem} />
+            <li key={cartItem.id}>
               <img
-                className="cart--item-icon"
-                src={`/assets/icons/${item.id}.svg`}
+                className="cart--cartItem-icon"
+                src={`/assets/icons/${cartItem.id}.svg`}
                 alt=""
               />
-              <p>beetroot</p>
-              <button className="quantity-btn remove-btn center">-</button>
-              <span className="quantity-text center">1</span>
-              <button className="quantity-btn add-btn center">+</button>
+              <p>{cartItem.name}</p>
+              <button className="quantity-btn remove-btn center"
+                onClick={() => {removeQuantityFromCart(cartItem)}}              
+              >-</button>
+              <span className="quantity-text center">{cartItem.quantity}</span>
+              <button className="quantity-btn add-btn center"
+                onClick={() => {addQuantityIntoCart(cartItem)}}
+              >+</button>
             </li>
           ))}           
 
@@ -119,3 +119,6 @@ function App() {
 }
 
 export default App
+
+{/* QUESTIONS 
+setCart( can have the name of the f or the newCart as argument here... I dont get it) */}
