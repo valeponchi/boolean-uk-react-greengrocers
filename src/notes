@@ -14,8 +14,8 @@ Deliverables
 Instructions
 - ✅Use this template as a starting point => https://codesandbox.io/s/greengrocers-react-version-starter-template-hx5xj
 - ✅Create all the pieces of the state you need, using the example provided
-- Add all the event listeners you need to make the page reactive
-- Create all the components you need, using the templates as a reference
+- ✅Add all the event listeners you need to make the page reactive
+- ✅Create all the components you need, using the templates as a reference
 
 Tips
 - Try to figure out what your component hierarchy should be before starting to code

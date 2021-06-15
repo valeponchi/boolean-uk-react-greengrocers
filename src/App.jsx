@@ -1,79 +1,105 @@
-import { useState } from "react"
-import Footer from "./components/Footer.js";
-import Header from "./components/Header.js";
-import Main from "./components/Main.js";
+//IMPORTS:
+import { useEffect, useState } from 'react'
+import Footer from './components/Footer.js'
+import Header from './components/Header.js'
+import Main from './components/Main.js'
+import {
+	createCartItem,
+	decreaseCartItemQuantity,
+	deleteCartItem,
+	getCart,
+	getStore,
+	increaseCartItemQuantity,
+} from './data/api.js'
 
-import initialItems from './data/items.js'
+// import initialItems from './data/items.js' // NOW THEY COME FROM SERVER
 
-import "./styles/index.css";
-
+import './styles/index.css'
 
 function App() {
-  const [shop, setShop] = useState(initialItems)
-  const [cart, setCart] = useState([])
+	const [shop, setShop] = useState([])
+	const [cart, setCart] = useState([])
 
-  let total = 0
-  for (const cartItem of cart) {
-    const shopItem = shop.find( shopItem => shopItem.id === cartItem.id )
-    total += cartItem.quantity * shopItem.price
-  }
+	//GET SHOP and CART FROM SERVER
+	useEffect(() => {
+		getStore()
+			//initialItemsFromServer => setShop(initialItemsFromServer) SAME of:
+			.then(setShop)
+			.then(getCart().then(setCart))
+	}, [])
 
-  function addToCart(itemId) {
-    const foundItem = cart.find(cartItem => cartItem.id === itemId)
-    
-    if (foundItem !== undefined) {
-      const updatedCart = cart.map(cartItem =>
-        cartItem.id === itemId 
-        ? {...cartItem, quantity: cartItem.quantity +1}
-        : cartItem
-      )
-      setCart(updatedCart)
+	let total = 0
+	for (const cartItem of cart) {
+		const shopItem = shop.find(shopItem => shopItem.id === cartItem.id)
+		if (shopItem) {
+			total += cartItem.quantity * shopItem.price
+		}
+	}
 
-    } else {
-      const newCartItem = {
-        id: itemId,
-        quantity: 1
-      }
-      setCart([...cart, newCartItem])
-    }
-  }
-  
-  function removeFromCart(itemId) {
-    const foundItem = cart.find(cartItem => cartItem.id === itemId)
+	function addToCart(itemId) {
+		const foundItem = cart.find(cartItem => cartItem.id === itemId)
 
-    if (foundItem.quantity === 1) {
-      const updatedCart = cart.filter(cartItem => cartItem.id !== itemId) 
-      setCart(updatedCart)
+		//IF ITEM IS IN THE CART:
+		if (foundItem !== undefined) {
+			increaseCartItemQuantity(foundItem).then(updatedCartItemFromServer => {
+				const updatedCart = cart.map(cartItem =>
+					cartItem.id === itemId
+						? updatedCartItemFromServer //this is with the +1
+						: cartItem
+				)
+				setCart(updatedCart)
+			})
+		} else {
+			createCartItem(itemId).then(newItemFromServer => {
+				setCart([...cart, newItemFromServer])
+			})
+		}
+	}
 
-    } else {
-      const updatedCart = cart.map(cartItem =>
-        cartItem.id === itemId 
-        ? {...cartItem, quantity: cartItem.quantity -1}
-        : cartItem
-      )
-       setCart(updatedCart)
-    }
-  }
+	function removeFromCart(itemId) {
+		const foundItem = cart.find(cartItem => cartItem.id === itemId)
 
+		if (foundItem.quantity === 1) {
+			deleteCartItem(itemId).then(resp => {
+				if (resp.ok) {
+					const updatedCart = cart.filter(cartItem => cartItem.id !== itemId)
+					setCart(updatedCart)
+				} else {
+					alert('Failed to delete..') //you wouldn't alert in a real App
+				}
+			})
 
-  return (
-    <div className="App">
-      <Header 
-        addToCart={addToCart}
-        shop={shop}
-      />
+			//if there is more than 1 item in the cart:
+		} else {
+			decreaseCartItemQuantity(foundItem).then(updatedCartItemFromServer => {
+				const updatedCart = cart.map(cartItem =>
+					cartItem.id === itemId
+						? updatedCartItemFromServer //this is with the -1
+						: cartItem
+				)
+				setCart(updatedCart)
+			})
+		}
+	}
 
-     <Main 
-        cart={cart}
-        removeFromCart={removeFromCart}
-        addToCart={addToCart}
-        total={total}
-     />
+	return (
+		<div className="App">
+			<Header addToCart={addToCart} shop={shop} />
 
-    <Footer />
-    </div>
-  )
+			<Main
+				cart={cart}
+				removeFromCart={removeFromCart}
+				addToCart={addToCart}
+				total={total}
+			/>
+
+			<Footer />
+		</div>
+	)
 }
 
 export default App
 
+//QUESTION:
+// 1)why it adds items in the db.json but when I refresh the pg
+//   it doesn't display them in the cart?
