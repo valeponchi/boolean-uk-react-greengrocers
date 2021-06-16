@@ -58,19 +58,7 @@
     },
     {
       "id": "003-apple",
-      "quantity": 1
-    },
-    {
-      "id": "004-apricot",
-      "quantity": 4
-    },
-    {
-      "id": "010-eggplant",
-      "quantity": 1
-    },
-    {
-      "id": "008-berry",
-      "quantity": 1
+      "quantity": 2
     }
   ]
 }

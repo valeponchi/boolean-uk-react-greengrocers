@@ -87,6 +87,7 @@ function App() {
 			<Header addToCart={addToCart} shop={shop} />
 
 			<Main
+				shop={shop}
 				cart={cart}
 				removeFromCart={removeFromCart}
 				addToCart={addToCart}

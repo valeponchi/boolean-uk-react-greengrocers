@@ -1,14 +1,18 @@
+const rootURL = 'http://localhost:4000'
+const storeURL = `${rootURL}/items`
+const cartURL = `${rootURL}/cart`
+
 export function getStore() {
-	return fetch('http://localhost:4000/items').then(resp => resp.json())
+	return fetch(storeURL).then(resp => resp.json())
 }
 
 export function getCart() {
-	return fetch('http://localhost:4000/cart').then(resp => resp.json())
+	return fetch(cartURL).then(resp => resp.json())
 }
 
 export function createCartItem(newCartItemId) {
 	const cartData = { id: newCartItemId, quantity: 1 }
-	return fetch('http://localhost:4000/cart', {
+	return fetch(cartURL, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -18,7 +22,7 @@ export function createCartItem(newCartItemId) {
 }
 
 export function updateCartItem(cartData) {
-	return fetch(`http://localhost:4000/cart/${cartData.id}`, {
+	return fetch(`${cartURL}/${cartData.id}`, {
 		method: 'PATCH',
 		headers: {
 			'Content-Type': 'application/json',
@@ -38,7 +42,7 @@ export function decreaseCartItemQuantity(cartData) {
 }
 
 export function deleteCartItem(cartDataId) {
-	return fetch(`http://localhost:4000/cart/${cartDataId}`, {
+	return fetch(`${cartURL}/${cartDataId}`, {
 		method: 'DELETE',
 	})
 }
